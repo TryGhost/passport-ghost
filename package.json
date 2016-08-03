@@ -1,0 +1,41 @@
+{
+  "name": "passport-ghost",
+  "version": "0.0.1",
+  "description": "Passport strategy for Ghost OAuth 2.0",
+  "main": "./lib/oauth2.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bluebird": "3.4.1",
+    "ghost-ignition": "0.1.0",
+    "passport-oauth2": "1.1.2"
+  },
+  "scripts": {
+    "test": "NODE_ENV=testing ./node_modules/.bin/mocha --require test/utils.js -- $(find test -name '*.test.js')"
+  },
+  "devDependencies": {
+    "mocha": "3.1.0",
+    "chai": "3.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/TryGhost/passport-ghost.git"
+  },
+  "keywords": [
+    "auth",
+    "ghost",
+    "passportjs",
+    "oauth2"
+  ],
+  "author": {
+    "name": "Ghost Foundation",
+    "email": "hello@ghost.org",
+    "web": "https://ghost.org"
+  },
+  "license": "MIT",
+  "homepage": "https://ghost.org",
+  "bugs": {
+    "url": "https://github.com/TryGhost/passport-ghost/issues"
+  }
+}
