@@ -15,8 +15,10 @@
     "test": "NODE_ENV=testing ./node_modules/.bin/mocha --require test/utils.js -- $(find test -name '*.test.js')"
   },
   "devDependencies": {
-    "mocha": "3.1.0",
-    "chai": "3.5.0"
+    "chai": "3.5.0",
+    "grunt": "1.0.1",
+    "grunt-release": "0.14.0",
+    "mocha": "3.1.0"
   },
   "repository": {
     "type": "git",
