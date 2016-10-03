@@ -28,12 +28,12 @@ describe('Ghost Oauth2', function () {
             var ghostStrategy = new oauth2.Strategy({
                 callbackURL: 'http://localhost:8888/callback',
                 passReqToCallback: true,
-                url: 'http://my-patronus-server'
+                url: 'http://my-ghost-auth-server'
             }, function verifyCallback() {
             });
 
             should.exist(ghostStrategy);
-            ghostStrategy.url.should.eql('http://my-patronus-server');
+            ghostStrategy.url.should.eql('http://my-ghost-auth-server');
         });
     });
 
@@ -44,7 +44,7 @@ describe('Ghost Oauth2', function () {
             ghostStrategy = new oauth2.Strategy({
                 callbackURL: 'http://localhost:8888/callback',
                 passReqToCallback: true,
-                url: 'http://my-patronus-server'
+                url: 'http://my-ghost-auth-server'
             }, function verifyCallback() {
             });
         });
