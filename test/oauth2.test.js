@@ -206,4 +206,38 @@ describe('Ghost Oauth2', function () {
             });
         });
     });
+
+    describe('change callbackURL', function () {
+        var ghostStrategy;
+
+        before(function () {
+            ghostStrategy = new oauth2.Strategy({
+                callbackURL: 'http://localhost:8888/callback',
+                passReqToCallback: true,
+                url: 'http://my-ghost-auth-server'
+            }, function verifyCallback() {
+            });
+        });
+
+        it('success', function () {
+            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
+                method.should.eql('POST');
+                url.should.eql('http://my-ghost-auth-server/oauth2/client/redirect');
+                headers['content-type'].should.eql('application/json');
+                (typeof body).should.eql('string');
+                JSON.parse(body).client_id.should.eql('123456');
+                JSON.parse(body).client_secret.should.eql('secret');
+
+                requestDone(null, JSON.stringify({something: 'test'}));
+            });
+
+            return ghostStrategy.changeCallbackURL({
+                callbackURL: 'http://localhost:9000/callback',
+                clientId: '123456',
+                clientSecret: 'secret'
+            }).then(function (response) {
+                should.exist(response.something);
+            });
+        });
+    });
 });
