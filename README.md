@@ -15,6 +15,5 @@ new GhostStrategy({
   callbackURL: 'your-callback-url',
   url: 'your-own-auth-server-url',
   passReqToCallback: true
-
 }, callback);
 ```
