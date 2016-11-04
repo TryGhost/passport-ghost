@@ -1,5 +1,6 @@
 var oauth2 = require('../lib/oauth2'),
     sinon = require('sinon'),
+    errors = require('ghost-ignition').errors,
     sandbox = sinon.sandbox.create();
 
 describe('Ghost Oauth2', function () {
@@ -10,16 +11,30 @@ describe('Ghost Oauth2', function () {
     describe('instantiate', function () {
         it('no verify callback', function () {
             try {
-                var ghostStrategy = new oauth2.Strategy();
+                var ghostStrategy = new oauth2.Strategy({
+                    blogUri: 'http://example.com'
+                });
             } catch (err) {
                 should.exist(err);
                 (err instanceof TypeError).should.eql(true);
             }
         });
 
+        it('no blog uri', function () {
+            try {
+                var ghostStrategy = new oauth2.Strategy({
+                    callbackURL: 'http://localhost:8888/callback'
+                });
+            } catch (err) {
+                should.exist(err);
+                (err instanceof errors.IncorrectUsageError).should.eql(true);
+            }
+        });
+
         it('with callback url', function () {
             var ghostStrategy = new oauth2.Strategy({
                 callbackURL: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
                 passReqToCallback: true
             }, function verifyCallback() {
             });
@@ -32,6 +47,7 @@ describe('Ghost Oauth2', function () {
         it('with custom url', function () {
             var ghostStrategy = new oauth2.Strategy({
                 callbackURL: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
             }, function verifyCallback() {
@@ -48,6 +64,7 @@ describe('Ghost Oauth2', function () {
         before(function () {
             ghostStrategy = new oauth2.Strategy({
                 callbackURL: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
             }, function verifyCallback() {
@@ -93,6 +110,7 @@ describe('Ghost Oauth2', function () {
         before(function () {
             ghostStrategy = new oauth2.Strategy({
                 callbackURL: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
             }, function verifyCallback() {
@@ -158,6 +176,7 @@ describe('Ghost Oauth2', function () {
         before(function () {
             ghostStrategy = new oauth2.Strategy({
                 callbackURL: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
             }, function verifyCallback() {
@@ -213,6 +232,7 @@ describe('Ghost Oauth2', function () {
         before(function () {
             ghostStrategy = new oauth2.Strategy({
                 callbackURL: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
             }, function verifyCallback() {
