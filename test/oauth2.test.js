@@ -126,12 +126,18 @@ describe('Ghost Oauth2', function () {
                 JSON.parse(body).client_name.should.eql('client');
                 JSON.parse(body).redirect_uri.should.eql('http://localhost:8888/callback');
 
-                requestDone(new Error('connection refused'));
+                requestDone({
+                    statusCode: 422,
+                    data: JSON.stringify(new errors.BadRequestError({
+                        message: 'connection refused'
+                    }))
+                });
             });
 
             return ghostStrategy.registerClient()
                 .catch(function (err) {
                     should.exist(err);
+                    (err instanceof errors.IgnitionError).should.eql(true);
                 });
         });
 
@@ -192,13 +198,20 @@ describe('Ghost Oauth2', function () {
                 should.not.exist(JSON.parse(body).access_token);
                 should.not.exist(JSON.parse(body).oldPassword);
 
-                requestDone(new Error('validation error'));
+                requestDone({
+                    statusCode: 422,
+                    data: JSON.stringify(new errors.ValidationError({
+                        message: 'validation error'
+                    }))
+                });
             });
 
-            ghostStrategy.changePassword(null, function (err) {
-                should.exist(err);
-                done();
-            });
+            ghostStrategy.changePassword(null)
+                .catch(function (err) {
+                    should.exist(err);
+                    (err instanceof errors.IgnitionError).should.eql(true);
+                    done();
+                });
         });
 
         it('success', function (done) {
@@ -218,8 +231,7 @@ describe('Ghost Oauth2', function () {
                 accessToken: 'a',
                 oldPassword: 'b',
                 newPassword: 'c'
-            }, function (err, response) {
-                should.not.exist(err);
+            }).then(function (response) {
                 should.exist(response.something);
                 done();
             });
@@ -260,4 +272,5 @@ describe('Ghost Oauth2', function () {
             });
         });
     });
-});
+})
+;
