@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "bluebird": "3.4.1",
-    "ghost-ignition": "1.0.0",
+    "ghost-ignition": "2.0.0",
     "passport-oauth2": "1.1.2"
   },
   "scripts": {
