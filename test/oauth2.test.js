@@ -44,9 +44,22 @@ describe('Ghost Oauth2', function () {
             ghostStrategy.url.should.eql('https://auth.ghost.org');
         });
 
+        it('with redirect uri', function () {
+            var ghostStrategy = new oauth2.Strategy({
+                redirectUri: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
+                passReqToCallback: true
+            }, function verifyCallback() {
+            });
+
+            should.exist(ghostStrategy);
+            ghostStrategy.name.should.eql('ghost');
+            ghostStrategy.url.should.eql('https://auth.ghost.org');
+        });
+
         it('with custom url', function () {
             var ghostStrategy = new oauth2.Strategy({
-                callbackURL: 'http://localhost:8888/callback',
+                redirectUri: 'http://localhost:8888/callback',
                 blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
@@ -63,7 +76,7 @@ describe('Ghost Oauth2', function () {
 
         before(function () {
             ghostStrategy = new oauth2.Strategy({
-                callbackURL: 'http://localhost:8888/callback',
+                redirectUri: 'http://localhost:8888/callback',
                 blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
@@ -109,7 +122,7 @@ describe('Ghost Oauth2', function () {
 
         before(function () {
             ghostStrategy = new oauth2.Strategy({
-                callbackURL: 'http://localhost:8888/callback',
+                redirectUri: 'http://localhost:8888/callback',
                 blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
@@ -172,7 +185,7 @@ describe('Ghost Oauth2', function () {
 
         before(function () {
             ghostStrategy = new oauth2.Strategy({
-                callbackURL: 'http://localhost:8888/callback',
+                redirectUri: 'http://localhost:8888/callback',
                 blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
@@ -229,12 +242,77 @@ describe('Ghost Oauth2', function () {
         });
     });
 
+    describe('update client', function () {
+        var ghostStrategy;
+
+        before(function () {
+            ghostStrategy = new oauth2.Strategy({
+                redirectUri: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
+                passReqToCallback: true,
+                url: 'http://my-ghost-auth-server'
+            }, function verifyCallback() {
+            });
+        });
+
+        it('success', function () {
+            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
+                method.should.eql('PUT');
+                url.should.eql('http://my-ghost-auth-server/oauth2/client');
+                headers['content-type'].should.eql('application/json');
+                (typeof body).should.eql('string');
+                JSON.parse(body).client_id.should.eql('123456');
+                JSON.parse(body).client_secret.should.eql('secret');
+                JSON.parse(body).name.should.eql('my-client');
+                should.not.exist(JSON.parse(body).description);
+
+                requestDone(null, JSON.stringify({something: 'test'}));
+            });
+
+            return ghostStrategy.updateClient({
+                clientId: '123456',
+                clientSecret: 'secret',
+                name: 'my-client'
+            }).then(function (response) {
+                should.exist(response.something);
+            });
+        });
+
+        it('success', function () {
+            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
+                method.should.eql('PUT');
+                url.should.eql('http://my-ghost-auth-server/oauth2/client');
+                headers['content-type'].should.eql('application/json');
+                (typeof body).should.eql('string');
+                JSON.parse(body).client_id.should.eql('123456');
+                JSON.parse(body).client_secret.should.eql('secret');
+                JSON.parse(body).name.should.eql('my-client');
+                JSON.parse(body).description.should.eql('description');
+                JSON.parse(body).blog_uri.should.eql('http://has-changed');
+                should.not.exist(JSON.parse(body).redirect_uri);
+
+                requestDone(null, JSON.stringify({something: 'test'}));
+            });
+
+            return ghostStrategy.updateClient({
+                clientId: '123456',
+                clientSecret: 'secret',
+                name: 'my-client',
+                description: 'description',
+                blogUri: 'http://has-changed'
+            }).then(function (response) {
+                should.exist(response.something);
+            });
+        });
+    });
+
+    // @deprecated
     describe('change callbackURL', function () {
         var ghostStrategy;
 
         before(function () {
             ghostStrategy = new oauth2.Strategy({
-                callbackURL: 'http://localhost:8888/callback',
+                redirectUri: 'http://localhost:8888/callback',
                 blogUri: 'http://example.com',
                 passReqToCallback: true,
                 url: 'http://my-ghost-auth-server'
@@ -250,12 +328,13 @@ describe('Ghost Oauth2', function () {
                 (typeof body).should.eql('string');
                 JSON.parse(body).client_id.should.eql('123456');
                 JSON.parse(body).client_secret.should.eql('secret');
+                JSON.parse(body).redirect_uri.should.eql('http://localhost:9000/callback');
 
                 requestDone(null, JSON.stringify({something: 'test'}));
             });
 
             return ghostStrategy.changeCallbackURL({
-                callbackURL: 'http://localhost:9000/callback',
+                redirectUri: 'http://localhost:9000/callback',
                 clientId: '123456',
                 clientSecret: 'secret'
             }).then(function (response) {
@@ -263,5 +342,4 @@ describe('Ghost Oauth2', function () {
             });
         });
     });
-})
-;
+});
