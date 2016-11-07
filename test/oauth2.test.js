@@ -155,11 +155,12 @@ describe('Ghost Oauth2', function () {
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
                 JSON.parse(body).name.should.eql('my-blog');
+                JSON.parse(body).description.should.eql('my blog description');
                 JSON.parse(body).redirect_uri.should.eql('http://localhost:8888/callback');
                 requestDone(null, JSON.stringify({client_id: '1'}));
             });
 
-            return ghostStrategy.registerClient({name: 'my-blog'})
+            return ghostStrategy.registerClient({name: 'my-blog', description: 'my blog description'})
                 .then(function (response) {
                     response.client_id.should.eql('1');
                 });
