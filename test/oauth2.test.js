@@ -123,7 +123,7 @@ describe('Ghost Oauth2', function () {
                 url.should.eql('http://my-ghost-auth-server/oauth2/client');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
-                JSON.parse(body).client_name.should.eql('client');
+                JSON.parse(body).name.should.eql('client');
                 JSON.parse(body).redirect_uri.should.eql('http://localhost:8888/callback');
 
                 requestDone({
@@ -141,20 +141,10 @@ describe('Ghost Oauth2', function () {
                 });
         });
 
-        it('no options, expect default client name', function () {
-            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
-                method.should.eql('POST');
-                url.should.eql('http://my-ghost-auth-server/oauth2/client');
-                headers['content-type'].should.eql('application/json');
-                (typeof body).should.eql('string');
-                JSON.parse(body).client_name.should.eql('client');
-                JSON.parse(body).redirect_uri.should.eql('http://localhost:8888/callback');
-                requestDone(null, JSON.stringify({client_id: '1'}));
-            });
-
+        it('no options, expect error', function () {
             return ghostStrategy.registerClient()
-                .then(function (response) {
-                    response.client_id.should.eql('1');
+                .catch(function (err) {
+                    (err instanceof errors.IncorrectUsageError).should.eql(true);
                 });
         });
 
@@ -164,12 +154,12 @@ describe('Ghost Oauth2', function () {
                 url.should.eql('http://my-ghost-auth-server/oauth2/client');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
-                JSON.parse(body).client_name.should.eql('my-blog');
+                JSON.parse(body).name.should.eql('my-blog');
                 JSON.parse(body).redirect_uri.should.eql('http://localhost:8888/callback');
                 requestDone(null, JSON.stringify({client_id: '1'}));
             });
 
-            return ghostStrategy.registerClient({clientName: 'my-blog'})
+            return ghostStrategy.registerClient({name: 'my-blog'})
                 .then(function (response) {
                     response.client_id.should.eql('1');
                 });

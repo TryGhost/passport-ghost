@@ -11,10 +11,13 @@ npm install passport-ghost
 
 ```
 var GhostStrategy = require('passport-ghost').Strategy;
-new GhostStrategy({
+
+var ghostStrategy = new GhostStrategy({
   callbackURL: 'your-callback-url',
   blogUri: 'your-blog-url',
   url: 'your-own-auth-server-url',
   passReqToCallback: true
 }, callback);
+
+ghostStrategy.registerClient({name: 'your-client-name'});
 ```
