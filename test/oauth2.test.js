@@ -71,6 +71,55 @@ describe('Ghost Oauth2', function () {
         });
     });
 
+    describe('meta tests', function () {
+        it('service not found', function (done) {
+            var ghostStrategy = new oauth2.Strategy({
+                redirectUri: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
+                passReqToCallback: true,
+                url: 'http://my-ghost-auth-server',
+                retryTimeout: 100,
+                retries: 5
+            }, function verifyCallback() {
+            });
+
+            sandbox.spy(ghostStrategy, 'makeRequest');
+
+            ghostStrategy.registerClient({name: 'my-client'})
+                .then(function () {
+                    done(new Error('expected error'));
+                })
+                .catch(function (err) {
+                    err.code.should.eql('ENOTFOUND');
+                    ghostStrategy.makeRequest.callCount.should.eql(6);
+                    done();
+                });
+        });
+
+        it('service is down', function (done) {
+            var ghostStrategy = new oauth2.Strategy({
+                redirectUri: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
+                passReqToCallback: true,
+                url: 'http://localhost:8081',
+                retryTimeout: 100
+            }, function verifyCallback() {
+            });
+
+            sandbox.spy(ghostStrategy, 'makeRequest');
+
+            ghostStrategy.registerClient({name: 'my-client'})
+                .then(function () {
+                    done(new Error('expected error'));
+                })
+                .catch(function (err) {
+                    err.code.should.eql('ECONNREFUSED');
+                    ghostStrategy.makeRequest.callCount.should.eql(11);
+                    done();
+                });
+        });
+    });
+
     describe('get user profile', function () {
         var ghostStrategy;
 
