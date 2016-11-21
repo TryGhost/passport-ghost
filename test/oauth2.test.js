@@ -72,30 +72,6 @@ describe('Ghost Oauth2', function () {
     });
 
     describe('meta tests', function () {
-        it('service not found', function (done) {
-            var ghostStrategy = new oauth2.Strategy({
-                redirectUri: 'http://localhost:8888/callback',
-                blogUri: 'http://example.com',
-                passReqToCallback: true,
-                url: 'http://my-ghost-auth-server',
-                retryTimeout: 100,
-                retries: 5
-            }, function verifyCallback() {
-            });
-
-            sandbox.spy(ghostStrategy, 'makeRequest');
-
-            ghostStrategy.registerClient({name: 'my-client'})
-                .then(function () {
-                    done(new Error('expected error'));
-                })
-                .catch(function (err) {
-                    err.code.should.eql('ENOTFOUND');
-                    ghostStrategy.makeRequest.callCount.should.eql(6);
-                    done();
-                });
-        });
-
         it('service is down', function (done) {
             var ghostStrategy = new oauth2.Strategy({
                 redirectUri: 'http://localhost:8888/callback',
@@ -242,7 +218,7 @@ describe('Ghost Oauth2', function () {
             });
         });
 
-        it('error: no data', function (done) {
+        it('error: no data send', function (done) {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('PUT');
                 url.should.eql('http://my-ghost-auth-server/oauth2/password');
@@ -263,6 +239,33 @@ describe('Ghost Oauth2', function () {
                 .catch(function (err) {
                     should.exist(err);
                     (err instanceof errors.IgnitionError).should.eql(true);
+                    (err instanceof errors.ValidationError).should.eql(true);
+                    done();
+                });
+        });
+
+        it('error: no data send (JSONAPI FORMAT)', function (done) {
+            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
+                method.should.eql('PUT');
+                url.should.eql('http://my-ghost-auth-server/oauth2/password');
+                headers['content-type'].should.eql('application/json');
+                (typeof body).should.eql('string');
+                should.not.exist(JSON.parse(body).access_token);
+                should.not.exist(JSON.parse(body).oldPassword);
+
+                requestDone({
+                    statusCode: 422,
+                    data: JSON.stringify(errors.utils.serialize(new errors.ValidationError({
+                        message: 'validation error'
+                    })))
+                });
+            });
+
+            ghostStrategy.changePassword(null)
+                .catch(function (err) {
+                    should.exist(err);
+                    (err instanceof errors.IgnitionError).should.eql(true);
+                    (err instanceof errors.ValidationError).should.eql(true);
                     done();
                 });
         });
