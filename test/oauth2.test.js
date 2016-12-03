@@ -117,7 +117,7 @@ describe('Ghost Oauth2', function () {
         });
 
         it('with access token: cant parse body', function (done) {
-            sandbox.stub(ghostStrategy._oauth2, 'get', function (url, token, profileDone) {
+            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, token, profileDone) {
                 profileDone(null, 'body');
             });
 
@@ -128,9 +128,9 @@ describe('Ghost Oauth2', function () {
         });
 
         it('with access token', function (done) {
-            sandbox.stub(ghostStrategy._oauth2, 'get', function (url, token, profileDone) {
+            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, token, profileDone) {
                 token.should.eql('access-token');
-                url.should.eql('http://my-ghost-auth-server/oauth2/userinfo');
+                url.should.eql('http://my-ghost-auth-server/oauth2/userinfo/');
                 profileDone(null, JSON.stringify({profile: 'katharina'}));
             });
 
@@ -158,7 +158,7 @@ describe('Ghost Oauth2', function () {
         it('error', function () {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('POST');
-                url.should.eql('http://my-ghost-auth-server/oauth2/client');
+                url.should.eql('http://my-ghost-auth-server/oauth2/client/');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
                 JSON.parse(body).name.should.eql('client');
@@ -189,7 +189,7 @@ describe('Ghost Oauth2', function () {
         it('with options', function () {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('POST');
-                url.should.eql('http://my-ghost-auth-server/oauth2/client');
+                url.should.eql('http://my-ghost-auth-server/oauth2/client/');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
                 JSON.parse(body).name.should.eql('my-blog');
@@ -221,7 +221,7 @@ describe('Ghost Oauth2', function () {
         it('error: no data send ', function (done) {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('PUT');
-                url.should.eql('http://my-ghost-auth-server/oauth2/password');
+                url.should.eql('http://my-ghost-auth-server/oauth2/password/');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
                 should.not.exist(JSON.parse(body).access_token);
@@ -247,7 +247,7 @@ describe('Ghost Oauth2', function () {
         it('error: no data send (JSONAPI FORMAT)', function (done) {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('PUT');
-                url.should.eql('http://my-ghost-auth-server/oauth2/password');
+                url.should.eql('http://my-ghost-auth-server/oauth2/password/');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
                 should.not.exist(JSON.parse(body).access_token);
@@ -273,7 +273,7 @@ describe('Ghost Oauth2', function () {
         it('success', function (done) {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('PUT');
-                url.should.eql('http://my-ghost-auth-server/oauth2/password');
+                url.should.eql('http://my-ghost-auth-server/oauth2/password/');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
                 JSON.parse(body).access_token.should.eql('a');
@@ -310,7 +310,7 @@ describe('Ghost Oauth2', function () {
         it('success', function () {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('PUT');
-                url.should.eql('http://my-ghost-auth-server/oauth2/client');
+                url.should.eql('http://my-ghost-auth-server/oauth2/client/');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
                 JSON.parse(body).client_id.should.eql('123456');
@@ -333,7 +333,7 @@ describe('Ghost Oauth2', function () {
         it('success', function () {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('PUT');
-                url.should.eql('http://my-ghost-auth-server/oauth2/client');
+                url.should.eql('http://my-ghost-auth-server/oauth2/client/');
                 headers['content-type'].should.eql('application/json');
                 (typeof body).should.eql('string');
                 JSON.parse(body).client_id.should.eql('123456');
