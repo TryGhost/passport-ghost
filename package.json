@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "bluebird": "3.4.1",
-    "ghost-ignition": "2.2.0",
+    "ghost-ignition": "2.4.0",
     "lodash": "4.16.6",
     "passport-oauth2": "1.1.2"
   },

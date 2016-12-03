@@ -218,7 +218,7 @@ describe('Ghost Oauth2', function () {
             });
         });
 
-        it('error: no data send', function (done) {
+        it('error: no data send ', function (done) {
             sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, query, requestDone) {
                 method.should.eql('PUT');
                 url.should.eql('http://my-ghost-auth-server/oauth2/password');
@@ -257,7 +257,7 @@ describe('Ghost Oauth2', function () {
                     statusCode: 422,
                     data: JSON.stringify(errors.utils.serialize(new errors.ValidationError({
                         message: 'validation error'
-                    })))
+                    }), {format: 'oauth'}))
                 });
             });
 
