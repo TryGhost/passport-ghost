@@ -33,3 +33,7 @@ ghostStrategy.updateClient({
   blogUri: 'your-blog-url'                   [optional]
 });
 ```
+
+# Copyright & License
+
+Copyright (c) 2016-2017 Ghost Foundation - Released under the [MIT license](LICENSE).
