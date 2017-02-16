@@ -17,6 +17,9 @@ var ghostStrategy = new GhostStrategy({
   blogUri: 'your-blog-url',                  [required]
   url: 'your-own-auth-server-url',           [required]
   passReqToCallback: true                    [optional]
+  retries                                    [optional] default 10
+  retryTimeout                               [optional] default 5000ms
+  retryHook: function                        [optional] If an error occurs while retrying, you can define a hook to get notified
 }, callback);
 
 ghostStrategy.registerClient({
