@@ -96,7 +96,7 @@ describe('Ghost Oauth2', function () {
         });
     });
 
-    describe('get user profile', function () {
+    describe('get user profile by token', function () {
         var ghostStrategy;
 
         before(function () {
@@ -135,6 +135,52 @@ describe('Ghost Oauth2', function () {
             });
 
             ghostStrategy.userProfile('access-token', function (err, response) {
+                should.not.exist(err);
+                should.exist(response.profile);
+                done();
+            });
+        });
+    });
+
+    describe('get user profile by identity id', function () {
+        var ghostStrategy;
+
+        before(function () {
+            ghostStrategy = new oauth2.Strategy({
+                redirectUri: 'http://localhost:8888/callback',
+                blogUri: 'http://example.com',
+                passReqToCallback: true,
+                url: 'http://my-ghost-auth-server'
+            }, function verifyCallback() {
+            });
+        });
+
+        it('no id', function (done) {
+            ghostStrategy.userProfileByIdentityId(null, function (err) {
+                should.exist(err);
+                done();
+            });
+        });
+
+        it('with id: cant parse body', function (done) {
+            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, token, profileDone) {
+                profileDone(null, 'body');
+            });
+
+            ghostStrategy.userProfileByIdentityId('1234', function (err) {
+                should.exist(err);
+                done();
+            });
+        });
+
+        it('with id and success', function (done) {
+            sandbox.stub(ghostStrategy._oauth2, '_request', function (method, url, headers, body, token, profileDone) {
+                should.not.exist(token);
+                url.should.eql('http://my-ghost-auth-server/oauth2/userinfo/1234/?client_id=clientID&client_secret=clientSecret');
+                profileDone(null, JSON.stringify({profile: 'katharina'}));
+            });
+
+            ghostStrategy.userProfileByIdentityId('1234', function (err, response) {
                 should.not.exist(err);
                 should.exist(response.profile);
                 done();
